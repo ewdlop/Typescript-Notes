@@ -2,6 +2,7 @@ import { Animal, Car, Cat, Golfer } from "./class";
 import { fn } from "./function";
 import { Shapes } from "./namespace";
 import polygons = Shapes.Polygons;
+import { doSomething }  from "./no-type";
 
 {
     //tuple
