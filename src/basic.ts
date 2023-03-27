@@ -3,6 +3,7 @@ import { fn } from "./function";
 import { Shapes } from "./namespace";
 import polygons = Shapes.Polygons;
 import { doSomething }  from "./no-type";
+import { NameOrResolver } from "./type";
 
 {
     //tuple
@@ -32,4 +33,6 @@ import { doSomething }  from "./no-type";
 
 
     let sq = new polygons.Square();
+
+    let resolve: NameOrResolver;
 }

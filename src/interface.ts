@@ -1,6 +1,6 @@
 import { NameResolver } from "./type";
 
-export interface Empty<T> {}
+export interface Empty<T> { }
 
 
 export interface NotEmpty<T> {
@@ -18,11 +18,11 @@ export interface Shop {
 
 export interface A {
     [key: string]: any;
-  }
+}
 
 
 export interface CreateArrayFunc {
-    <T>({length, value}:{length: number, value: T}): Array<T>;
+    <T>({ length, value }: { length: number, value: T }): Array<T>;
 }
 
 export interface CreateArrayFunc2<T> {
@@ -38,12 +38,12 @@ export interface Backpack<Type> {
     get: () => Type;
 }
 
-export interface Test<T extends ()=>void> {
+export interface Test<T extends () => void> {
     test: T;
 }
 
-export interface Test2 extends Test<()=>void> {
-} 
+export interface Test2 extends Test<() => void> {
+}
 
-export interface NameResolver extends NameResolver {
+export interface NameResolver2 extends NameResolver {
 }
