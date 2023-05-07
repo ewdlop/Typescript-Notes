@@ -50,4 +50,3 @@ export class Either<E, A> {
       return new Either<E, A>(value);
     }
 }
-  
