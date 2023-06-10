@@ -1,4 +1,4 @@
-import { type } from "os";
+import { B } from "../type";
 
 //2 - Get Return Type
 {
@@ -171,6 +171,15 @@ type TupleToObject<T extends readonly (string | number)[]> = {
  *  .option('bar', { value: 'Hello World' })
  *  .get()
  * 
+ * // expect result to be:
+ * // {
+ * //   foo: number
+ * //   name: string
+ * //   bar: {
+ * //     value: string
+ * //   }
+ * // }
+ * 
  * //expect the type of result to be:
  * interface Result {
  *   foo: number
@@ -303,6 +312,8 @@ type TrimLeft<T extends string> = T extends `${Space}${infer P}` ? TrimLeft<P> :
  */
 type Trim<T extends string> = T extends `${Space}${infer P}` | `${infer P}${Space}` ? Trim<P> : T;
 
+{
+    
 //110 Capitalize
 /**
  * Example usage:
@@ -310,8 +321,8 @@ type Trim<T extends string> = T extends `${Space}${infer P}` | `${infer P}${Spac
  * type capitalized = Capitalize<'hello world'> // expected to be 'Hello world'
  * ```
  */
-type Capitalize<T extends string> = T extends `${infer P}${infer tail}` ? `${Uppercase<P>}${tail}` : T;
-
+    type Capitalize<T extends string> = T extends `${infer P}${infer tail}` ? `${Uppercase<P>}${tail}` : T;
+}
 //116 Replace
 /**
  * Example usage:
@@ -329,7 +340,6 @@ type Replace<S extends string, From extends string, To extends string> = From ex
  * ```
  */
 type ReplaceAll<S extends string, From extends string, To extends string> = From extends '' ? S : S extends `${infer P}${From}${infer tail}` ? `${P}${To}${ReplaceAll<tail, From, To>}` : S;
-
 
 //189 Awaited
 {
@@ -390,6 +400,35 @@ type Flatten<InputArray extends any[], OutputArray extends any[] = []> =
     Head extends any[] ?
     Flatten<[...Head, ...Tail], OutputArray> : Flatten<Tail, [...OutputArray, Head]> : OutputArray;
 
+//527 -  Append to object
+/**
+ * Example usage:
+ * type Test = { id: '1' }
+ * type Result = AppendToObject<Test, 'value', 4> // expected to be { id: '1', value: 4 }
+ * ```
+ */
+type AppendToObject<T extends object, U extends string, V> = {
+    [P in keyof T | U]: P extends keyof T ? T[P] : V
+};
+
+//529 - Absolute
+/**
+ * Example usage:
+ * type Test = -100;
+ * type Result = Absolute<Test>; // expected to be "100"
+ * ```
+ */
+type Absolute<T extends number | string | bigint> = `${T}` extends `-${infer P}` ? P : `${T}`;
+
+//531 -  String to Union
+/**
+ * Example usage:
+ * type Test = '123';
+ * type Result = StringToUnion<Test>; // expected to be "1" | "2" | "3"
+ * ```
+ */
+type StringToUnion<T extends string> = T extends `${infer Letter}${infer Rest}` ? Letter | StringToUnion<Rest> : never;
+
 //533 - Concat
 /**
  * Example usage:
@@ -398,6 +437,58 @@ type Flatten<InputArray extends any[], OutputArray extends any[] = []> =
  * ```
  */
 type Concat<T extends unknown[], U extends unknown[]> = [...T, ...U];
+
+//539 Merge
+/**
+ * Example usage:
+ * ```
+ * type Foo = {
+ *  a: number;
+ *  b: string;
+ * };
+ * type Bar = {
+ *  c: number;
+ *  d: boolean;
+ * };
+ * type merged = Merge<Foo, Bar>; // expected to be { a: number; b: string; c: number; d: boolean }
+ * ```
+ */
+type Merge<T extends object, U extends object> = {
+    [P in keyof T | keyof U]: P extends keyof T ? T[P] : P extends keyof U ? U[P] : never
+};
+
+//612 - KebabCase
+/**
+ * Example usage:
+ * ```
+ * type kebabCase = KebabCase<'FooBarBaz'> // expected to be 'foo-bar-baz'
+ * const kebabCase: KebabCase<'FooBarBaz'> = 'foo-bar-baz'
+ * type DoNothing = KebabCase<'do-nothing'> // expected to be 'do-nothing'
+ * const doNothing: DoNothing = 'do-nothing'
+ * ```
+ */
+type KebabCase<S extends string> = S extends `${infer S1}${infer S2}`
+  ? S2 extends Uncapitalize<S2>
+  ? `${Uncapitalize<S1>}${KebabCase<S2>}`
+  : `${Uncapitalize<S1>}-${KebabCase<S2>}`
+  : S;
+
+//645 - Diff
+/**
+ * Example usage:
+ * ```
+ * type Foo = {
+ *  name: string;
+ *  age: string;
+ * };
+ * type Bar = {
+ *  name: string;
+ *  age: string;
+ * };
+ * type result = Diff<Foo, Bar>; // expected to be {}
+ * ```
+ */
+type Diff<O, O1> = Omit<O & O1, keyof (O | O1)>;
 
 //898 - Includes
 /**
@@ -408,7 +499,30 @@ type Concat<T extends unknown[], U extends unknown[]> = [...T, ...U];
  */
 type Includes<T extends readonly any[], U> = U extends T[number] ? true : false;
 
+// 949 - AnyOf
+/**
+ * Example usage:
+ * ```
+ * type Sample1 = AnyOf<[1, '', false, [], {}]> // expected to be true.
+ * type Sample2 = AnyOf<[0, '', false, [], {}]> // expected to be false.
+ * ```
+ */
+type AnyOf<T extends any[]> = T[number] extends 0 | '' | false | [] | {[key: string]: never}
+? false : true;
 
+// 1042 - Never 
+/**
+ * Example usage:
+ * ```
+ * type A = IsNever<never>  // expected to be true
+ * type B = IsNever<undefined> // expected to be false
+ * type C = IsNever<null> // expected to be false
+ * type D = IsNever<[]> // expected to be false
+ * type E = IsNever<number> // expected to be false
+ * ```
+ */
+type IsNever<T> = [T] extends [never] ? true : false;
+ 
 // 1050 - Push
 /**
  * Example usage:
