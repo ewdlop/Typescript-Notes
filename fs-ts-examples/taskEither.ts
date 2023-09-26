@@ -27,27 +27,48 @@ const result = pipe(
 )
 
 declare function begin(): Promise<void>
-declare function commit(): Promise<void>
+declare function commit(): Promise<never>
 declare function rollback(): Promise<void>
 
 const result2 = pipe(
-  tryCatch(
-    () => begin(),
-    (err) => new Error(`begin txn failed: ${err}`),
-  ),
-  chain(() =>
+    // Begin the transaction
     tryCatch(
-      () => commit(),
-      (err) => new Error(`commit txn failed: ${err}`),
+      () => begin(),
+      (err) => new Error(`begin txn failed: ${err}`),
     ),
-  ),
-  orElse((originalError) =>
-    pipe(
-      tryCatch(
-        () => rollback(),
-        (err) => new Error(`rollback txn failed: ${err}`),
-      ),
-      fold(left, () => left(originalError)),
+    chain(() => 
+      // Commit the transaction if beginning succeeds
+      pipe(
+        tryCatch(
+          () => commit(),
+          (err) => new Error(`commit txn failed: ${err}`)
+        ),
+        orElse((commitError) => 
+          // If committing fails, attempt to rollback
+          pipe(
+            tryCatch(
+              () => rollback(),
+              (err) => new Error(`rollback txn failed: ${err}`),
+            ),
+            fold(
+              (rollbackError) => left(rollbackError), // If rollback fails, report rollback error
+              () => left(commitError)                 // If rollback succeeds, report original commit error
+            )
+          )
+        )
+      )
     ),
-  ),
-)
+    orElse((beginError) =>
+      // If beginning fails, attempt to rollback
+      pipe(
+        tryCatch(
+          () => rollback(),
+          (err) => new Error(`rollback txn failed: ${err}`)
+        ),
+        fold(
+          (rollbackError) => left(rollbackError), // If rollback fails after begin fails, report rollback error
+          () => left(beginError)                 // If rollback succeeds after begin fails, report original begin error
+        )
+      )
+    )
+  );
