@@ -90,6 +90,8 @@ const product: Product = { id: 101, title: "Book", price: 29.99 };
 type Field = string & { __brand: "Field" };
 type CreateField = (s: string) => Field;
 
+// Note: Type assertion is safe here as we're creating a branded type for compile-time checking only
+// The __brand property is a phantom type that doesn't exist at runtime
 const createField: CreateField = (s) => s as Field;
 
 // ============================================================================
@@ -130,7 +132,9 @@ const simplifiedLove: SimplifiedLove = {
 type ChineseCharacter = "愛" | "心" | "爱";
 type WithoutHeart = Exclude<ChineseCharacter, "心">; // Removes 心 from the union
 
-const withoutHeart: WithoutHeart = "愛"; // Can be "愛" or "爱", but not "心"
+// WithoutHeart can be either "愛" or "爱", but not "心"
+const withoutHeartTraditional: WithoutHeart = "愛";
+const withoutHeartSimplified: WithoutHeart = "爱";
 
 // More practical subtraction examples
 type FullUser = {
