@@ -182,12 +182,63 @@ const moderator: NonAdminRoles = "moderator"; // Can be "user", "guest", or "mod
 // Type-level arithmetic demonstrations
 // ============================================================================
 
+// ============================================================================
+// Set-Theoretic Representation of Numbers (Von Neumann Ordinals)
+// ============================================================================
+
+/**
+ * In set theory, natural numbers can be represented as nested sets:
+ * - 0 = {} (empty set)
+ * - 1 = {0} = {{}} (set containing zero)
+ * - 2 = {0, 1} = {∅, {∅}} (set containing zero and one)
+ * - 3 = {0, 1, 2} = {∅, {∅}, {∅, {∅}}} (set containing zero, one, and two)
+ * 
+ * This connects type theory with set theory, showing how types can represent
+ * mathematical structures.
+ */
+
+// Representing empty set as a type
+type EmptySet = never;
+
+// Zero is the empty set
+type Zero = EmptySet;
+
+// One is the set containing zero: {0} = {{}}
+type OneSet = Zero;
+
+// Two is the set containing zero and one: {0, 1} = {∅, {∅}}
+type TwoSet = Zero | OneSet;
+
+// Three is the set containing zero, one, and two: {0, 1, 2} = {∅, {∅}, {∅, {∅}}}
+type ThreeSet = Zero | OneSet | TwoSet;
+
+/**
+ * More explicit representation using object literals:
+ * 3 = {∅, {∅}, {∅, {∅}}}
+ */
+type VonNeumannZero = Record<string, never>; // {}
+type VonNeumannOne = { zero: VonNeumannZero }; // {0}
+type VonNeumannTwo = { zero: VonNeumannZero; one: VonNeumannOne }; // {0, 1}
+type VonNeumannThree = {
+    zero: VonNeumannZero;
+    one: VonNeumannOne;
+    two: VonNeumannTwo;
+}; // {0, 1, 2} = 3
+
+// Example instance of the number 3 in set-theoretic notation
+const threeAsSet: VonNeumannThree = {
+    zero: {},
+    one: { zero: {} },
+    two: { zero: {}, one: { zero: {} } },
+};
+
 /**
  * Summary:
  * - Sum (Union): A | B represents "A or B" (addition)
  * - Product (Intersection): A & B represents "A and B" (multiplication)
  * - Quotient (Factoring): Extracting common patterns (division)
  * - Subtraction (Removal): Omit<T, K> and Exclude<T, U> remove types (subtraction)
+ * - Set Theory: Types can represent Von Neumann ordinals: 3 = {∅, {∅}, {∅, {∅}}}
  * 
  * Just as 一 + 二 = 三, we can combine and manipulate types algebraically!
  */
