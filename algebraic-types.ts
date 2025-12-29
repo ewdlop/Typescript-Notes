@@ -194,36 +194,25 @@ const moderator: NonAdminRoles = "moderator"; // Can be "user", "guest", or "mod
  * - 3 = {0, 1, 2} = {∅, {∅}, {∅, {∅}}} (set containing zero, one, and two)
  * 
  * This connects type theory with set theory, showing how types can represent
- * mathematical structures.
+ * mathematical structures. In TypeScript, we represent sets as objects where
+ * each property represents an element in the set.
  */
 
-// Representing empty set as a type
-type EmptySet = never;
+// Representing the empty set as an empty object type
+type VonNeumannZero = Record<string, never>; // 0 = {}
 
-// Zero is the empty set
-type Zero = EmptySet;
-
-// One is the set containing zero: {0} = {{}}
-type OneSet = Zero;
-
-// Two is the set containing zero and one: {0, 1} = {∅, {∅}}
-type TwoSet = Zero | OneSet;
-
-// Three is the set containing zero, one, and two: {0, 1, 2} = {∅, {∅}, {∅, {∅}}}
-type ThreeSet = Zero | OneSet | TwoSet;
-
-/**
- * More explicit representation using object literals:
- * 3 = {∅, {∅}, {∅, {∅}}}
- */
-type VonNeumannZero = Record<string, never>; // {}
+// One is the set containing zero: 1 = {0}
 type VonNeumannOne = { zero: VonNeumannZero }; // {0}
+
+// Two is the set containing zero and one: 2 = {0, 1}
 type VonNeumannTwo = { zero: VonNeumannZero; one: VonNeumannOne }; // {0, 1}
+
+// Three is the set containing zero, one, and two: 3 = {0, 1, 2}
 type VonNeumannThree = {
     zero: VonNeumannZero;
     one: VonNeumannOne;
     two: VonNeumannTwo;
-}; // {0, 1, 2} = 3
+}; // {0, 1, 2} = 3 = {∅, {∅}, {∅, {∅}}}
 
 // Example instance of the number 3 in set-theoretic notation
 const threeAsSet: VonNeumannThree = {
